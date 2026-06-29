@@ -5,17 +5,23 @@ from app.services.telegram import send_telegram_message
 
 router = APIRouter()
 
-
 def main_keyboard():
     return {
         "keyboard": [
             [{"text": "🛒 New Order"}, {"text": "📦 My Orders"}],
-            [{"text": "🛍 Open Shop"}, {"text": "❓ Help"}],
+            [
+                {
+                    "text": "🛍 Open Shop",
+                    "web_app": {
+                        "url": FRONTEND_URL
+                    }
+                },
+                {"text": "❓ Help"}
+            ],
         ],
         "resize_keyboard": True,
         "one_time_keyboard": False,
     }
-
 
 @router.post("/webhook")
 async def telegram_webhook(update: dict):
@@ -62,6 +68,7 @@ async def telegram_webhook(update: dict):
         send_telegram_message(
             chat_id,
             "Click the 🛍 Open Shop button below to open the shop.",
+            # shop_mini_app_keyboard(),
             main_keyboard(),
         )
 
