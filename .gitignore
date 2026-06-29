@@ -1,6 +1,5 @@
 .env
 venv/
-api/venv/
 __pycache__/
-api/__pycache__/
+__pycache__/
 *.pyc
