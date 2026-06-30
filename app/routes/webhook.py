@@ -28,6 +28,7 @@ def main_keyboard():
 async def telegram_webhook(update: dict):
     message = update.get("message", {})
     chat = message.get("chat", {})
+    sender = message.get("from", {})
     contact = message.get("contact")
     text = message.get("text", "")
     chat_id = chat.get("id")
@@ -36,9 +37,22 @@ async def telegram_webhook(update: dict):
         return {"ok": True}
 
     if contact:
+        telegram_user_id = sender.get("id") or chat_id
+        contact_user_id = contact.get("user_id")
+
+        if contact_user_id and str(contact_user_id) != str(telegram_user_id):
+            send_telegram_message(
+                chat_id,
+                "Please share your own phone number from Telegram.",
+                main_keyboard(),
+            )
+            return {"ok": True}
+
         save_telegram_contact(
-            contact.get("user_id") or chat_id,
+            telegram_user_id,
             contact.get("phone_number"),
+            sender.get("username"),
+            contact.get("first_name") or sender.get("first_name"),
         )
         send_telegram_message(
             chat_id,
