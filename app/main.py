@@ -1,10 +1,28 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import FRONTEND_URL
+from app.db.database import SessionLocal, init_db
+from app.db.seed import seed_initial_data
 from app.routes import products, auth, orders, webhook
 
-app = FastAPI(title="Telegram Ecomus API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+
+    db = SessionLocal()
+    try:
+        seed_initial_data(db)
+    finally:
+        db.close()
+
+    yield
+
+
+app = FastAPI(title="Telegram Ecomus API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

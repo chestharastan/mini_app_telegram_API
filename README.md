@@ -17,19 +17,48 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Run the Server
+### 3. Configure Environment
+
+Create a `.env` file:
 
 ```bash
-python main.py
+BOT_TOKEN=your_telegram_bot_token
+FRONTEND_URL=https://your-frontend-url.com
+ADMIN_CHAT_ID=your_admin_chat_id
+DATABASE_URL=sqlite:///./ecomus.db
 ```
 
-Or use uvicorn directly:
+`DATABASE_URL` is optional. If you do not set it, the API uses `sqlite:///./ecomus.db`.
+
+### 4. Run the Server
 
 ```bash
-uvicorn main:app --reload
+uvicorn index:app --reload
 ```
 
-The API will be available at `http://localhost:8000`
+The database tables are created automatically on startup, and the initial products/categories are seeded from `app/data/products.py`.
+
+## Create an Order
+
+The frontend only needs to send Telegram `initData`, product IDs, and quantities. The backend calculates prices from the database, saves the order, reduces stock, and sends Telegram messages.
+
+```json
+{
+  "initData": "telegram-web-app-init-data",
+  "items": [
+    {
+      "product_id": "prod-1",
+      "quantity": 1
+    }
+  ]
+}
+```
+
+Send it to:
+
+```http
+POST /api/orders
+```
 
 ## API Endpoints
 

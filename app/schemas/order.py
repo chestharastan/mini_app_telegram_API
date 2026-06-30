@@ -1,14 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class OrderItem(BaseModel):
     product_id: str
-    name: str
-    price: float
-    quantity: int
+    quantity: int = Field(gt=0)
 
 
 class CreateOrderRequest(BaseModel):
     initData: str
     items: list[OrderItem]
-    total: float
