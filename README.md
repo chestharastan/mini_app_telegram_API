@@ -40,11 +40,17 @@ The database tables are created automatically on startup, and the initial produc
 
 ## Create an Order
 
-The frontend only needs to send Telegram `initData`, product IDs, and quantities. The backend calculates prices from the database, saves the order, reduces stock, and sends Telegram messages.
+The frontend sends Telegram-compatible `initData`, the customer phone number,
+product IDs, and quantities. Public web checkout may use server-signed web
+checkout init data from the Next.js proxy. The backend calculates prices from
+the database, saves the order, reduces stock, and sends Telegram/admin messages.
+When a Telegram user shares their contact from the Mini App, the webhook stores
+that phone number by Telegram user ID so checkout can use it.
 
 ```json
 {
   "initData": "telegram-web-app-init-data",
+  "customerPhone": "+85512345678",
   "items": [
     {
       "product_id": "prod-1",

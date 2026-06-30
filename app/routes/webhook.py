@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.core.config import FRONTEND_URL
 from app.services.telegram import send_telegram_message
+from app.services.telegram_contacts import save_telegram_contact
 
 router = APIRouter()
 
@@ -27,10 +28,23 @@ def main_keyboard():
 async def telegram_webhook(update: dict):
     message = update.get("message", {})
     chat = message.get("chat", {})
+    contact = message.get("contact")
     text = message.get("text", "")
     chat_id = chat.get("id")
 
     if not chat_id:
+        return {"ok": True}
+
+    if contact:
+        save_telegram_contact(
+            contact.get("user_id") or chat_id,
+            contact.get("phone_number"),
+        )
+        send_telegram_message(
+            chat_id,
+            "Phone number saved. You can return to checkout.",
+            main_keyboard(),
+        )
         return {"ok": True}
 
     if text == "/start":
